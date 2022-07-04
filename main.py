@@ -15,10 +15,10 @@ class Main:
 		self.clock = pygame.time.Clock()
 
 	def drawGrid(self):
-		for x in range(self.screenWidth):
-			for y in range(self.screenHeight):
-				rect = pygame.Rect(x * self.blockSize, y * self.blockSize, self.blockSize, self.blockSize)
-				pygame.draw.rect(self.screen, 'Black', rect, 1)
+		for x in range(self.blockSize, self.screenWidth, self.blockSize):
+			pygame.draw.line(self.screen, 'Black', (x, 0), (x, self.screenHeight), 1)
+		for y in range(self.blockSize, self.screenHeight, self.blockSize):
+			pygame.draw.line(self.screen, 'Black', (0, y), (self.screenWidth, y), 1)
 
 	def loop(self, clockTick = None):
 		while True:
