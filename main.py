@@ -1,4 +1,3 @@
-from typing import NoReturn
 import pygame
 from sys import exit
 
