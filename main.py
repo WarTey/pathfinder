@@ -9,15 +9,28 @@ class Main:
 
 	def initPygame(self, windowTitle):
 		pygame.init()
-		self.screen = pygame.display.set_mode((self.screenWidth, self.screenHeight))
-		self.screen.fill('Black')
+		screen = pygame.display.set_mode((self.screenWidth, self.screenHeight))
+		screen.fill('Black')
 		pygame.display.set_caption(windowTitle)
+
+		self.screen = screen
 		self.clock = pygame.time.Clock()
 
 	def loop(self, grid, clockTick = None):
 		while True:
+			isMousePressed = pygame.mouse.get_pressed()
+			isLeftMousePressed = isMousePressed[0]
+			isRightMousePressed = isMousePressed[2]
+			mousePos = pygame.mouse.get_pos()
+
 			for event in pygame.event.get():
-				if event.type == pygame.QUIT:
+				isMouseMotionType = event.type == pygame.MOUSEMOTION
+
+				if isLeftMousePressed or isLeftMousePressed and isMouseMotionType:
+					grid.handleGridLeftClick(mousePos[0], mousePos[1])
+				elif isRightMousePressed or isRightMousePressed and isMouseMotionType:
+					grid.handleGridRightClick(mousePos[0], mousePos[1])
+				elif event.type == pygame.QUIT:
 					pygame.quit()
 					exit()
 

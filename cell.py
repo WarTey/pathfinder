@@ -11,3 +11,9 @@ class Cell:
 		self.cellType = CellType.Free
 		self.cellValue = 0
 		self.cellParent = None
+
+	def setWall(self):
+		self.cellType = CellType.Wall
+
+	def setFree(self):
+		self.cellType = CellType.Free
