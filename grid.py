@@ -8,5 +8,5 @@ class Grid:
 
 	def drawCells(self, screen):
 		for row, cells in enumerate(self.grid):
-			for col, _ in enumerate(cells):
-				pygame.draw.rect(screen, 'White', pygame.Rect(col * self.cellSize, row * self.cellSize, self.cellSize - 1, self.cellSize - 1))
+			for col, cell in enumerate(cells):
+				pygame.draw.rect(screen, cell.cellType.value, pygame.Rect(col * self.cellSize, row * self.cellSize, self.cellSize - 1, self.cellSize - 1))

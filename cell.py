@@ -1,9 +1,10 @@
 from enum import Enum
 
 class CellType(Enum):
-	Free = 1
-	Wall = 2
-	Explored = 3
+	Free = 'White'
+	Wall = 'Grey'
+	Explored = 'Yellow'
+	Path = 'Blue'
 
 class Cell:
 	def __init__(self):
