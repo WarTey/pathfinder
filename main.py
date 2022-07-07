@@ -10,16 +10,18 @@ class Main:
 	def initPygame(self, windowTitle):
 		pygame.init()
 		self.screen = pygame.display.set_mode((self.screenWidth, self.screenHeight))
-		self.screen.fill('White')
+		self.screen.fill('Black')
 		pygame.display.set_caption(windowTitle)
 		self.clock = pygame.time.Clock()
 
-	def loop(self, clockTick = None):
+	def loop(self, grid, clockTick = None):
 		while True:
 			for event in pygame.event.get():
 				if event.type == pygame.QUIT:
 					pygame.quit()
 					exit()
+
+			grid.drawCells(self.screen)
 
 			pygame.display.update()
 			if clockTick:
@@ -33,10 +35,7 @@ def main():
 
 	game = Main(SCREEN_WIDTH, SCREEN_HEIGHT)
 	game.initPygame(WINDOW_TITLE)
-
 	grid = Grid(SCREEN_WIDTH, SCREEN_HEIGHT, CELL_SIZE)
-	grid.drawSeparators(game.screen, SCREEN_WIDTH, SCREEN_HEIGHT)
-
-	game.loop()
+	game.loop(grid)
 
 main()
