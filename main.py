@@ -2,7 +2,7 @@ import pygame
 from sys import exit
 from grid import Grid
 
-class Main:
+class Game:
 	def __init__(self, screenWidth, screenHeight):
 		self.screenWidth = screenWidth
 		self.screenHeight = screenHeight
@@ -46,7 +46,7 @@ def main():
 	CELL_SIZE = 50
 	WINDOW_TITLE = 'Pathfinder'
 
-	game = Main(SCREEN_WIDTH, SCREEN_HEIGHT)
+	game = Game(SCREEN_WIDTH, SCREEN_HEIGHT)
 	game.initPygame(WINDOW_TITLE)
 	grid = Grid(SCREEN_WIDTH, SCREEN_HEIGHT, CELL_SIZE)
 	game.loop(grid)
