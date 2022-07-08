@@ -5,6 +5,8 @@ class CellType(Enum):
 	Wall = 'Grey'
 	Explored = 'Yellow'
 	Path = 'Blue'
+	Start = 'Green'
+	End = 'Red'
 
 class Cell:
 	def __init__(self):
@@ -12,8 +14,30 @@ class Cell:
 		self.cellValue = 0
 		self.cellParent = None
 
-	def setWall(self):
-		self.cellType = CellType.Wall
+	def getCellColor(self):
+		return self.cellType.value
+
+	def isCellValid(self, cellType):
+		return self.cellType == cellType
+
+	def setCellType(self, cellType):
+		freeType = CellType.Free
+		wallType = CellType.Wall
+
+		if ((cellType == freeType and self.isCellValid(wallType)) or
+			(cellType == wallType and self.isCellValid(freeType)) or
+			(cellType == CellType.Start and self.isCellValid(freeType)) or
+			(cellType == CellType.End and self.isCellValid(freeType))):
+			self.cellType = cellType
 
 	def setFree(self):
-		self.cellType = CellType.Free
+		self.setCellType(CellType.Free)
+
+	def setWall(self):
+		self.setCellType(CellType.Wall)
+
+	def setStart(self):
+		self.setCellType(CellType.Start)
+
+	def setEnd(self):
+		self.setCellType(CellType.End)
