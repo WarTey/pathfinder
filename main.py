@@ -1,6 +1,7 @@
 import pygame
 from sys import exit
 from grid import Grid
+from path import Path
 
 class Game:
 	def __init__(self, screenWidth, screenHeight):
@@ -16,25 +17,40 @@ class Game:
 		self.screen = screen
 		self.clock = pygame.time.Clock()
 
-	def loop(self, grid, clockTick = None):
+	def handleMouse(self, eventType, grid):
+		isMouseMotionType = eventType == pygame.MOUSEMOTION
+		isMousePressed = pygame.mouse.get_pressed()
+		isLeftMousePressed = isMousePressed[0]
+		isRightMousePressed = isMousePressed[2]
+		mousePos = pygame.mouse.get_pos()
+
+		if isLeftMousePressed or isLeftMousePressed and isMouseMotionType:
+			grid.handleGridLeftClick(mousePos[0], mousePos[1])
+		elif isRightMousePressed or isRightMousePressed and isMouseMotionType:
+			grid.handleGridRightClick(mousePos[0], mousePos[1])
+
+	def handleKeyboard(self, eventKey, path, isPathProcessing):
+		if eventKey == pygame.K_RETURN:
+			path.setProcess(not isPathProcessing)
+
+	def loop(self, grid, path, clockTick = None):
 		while True:
-			isMousePressed = pygame.mouse.get_pressed()
-			isLeftMousePressed = isMousePressed[0]
-			isRightMousePressed = isMousePressed[2]
-			mousePos = pygame.mouse.get_pos()
-
 			for event in pygame.event.get():
-				isMouseMotionType = event.type == pygame.MOUSEMOTION
+				eventType = event.type
+				isPathProcessing = path.isProcessing()
 
-				if isLeftMousePressed or isLeftMousePressed and isMouseMotionType:
-					grid.handleGridLeftClick(mousePos[0], mousePos[1])
-				elif isRightMousePressed or isRightMousePressed and isMouseMotionType:
-					grid.handleGridRightClick(mousePos[0], mousePos[1])
-				elif event.type == pygame.QUIT:
+				if not isPathProcessing:
+					self.handleMouse(eventType, grid)
+
+				if eventType == pygame.KEYDOWN:
+					self.handleKeyboard(event.key, path, isPathProcessing)
+				elif eventType == pygame.QUIT:
 					pygame.quit()
 					exit()
 
 			grid.drawCells(self.screen)
+			if isPathProcessing:
+				path.process(grid)
 
 			pygame.display.update()
 			if clockTick:
@@ -49,6 +65,7 @@ def main():
 	game = Game(SCREEN_WIDTH, SCREEN_HEIGHT)
 	game.initPygame(WINDOW_TITLE)
 	grid = Grid(SCREEN_WIDTH, SCREEN_HEIGHT, CELL_SIZE)
-	game.loop(grid)
+	path = Path()
+	game.loop(grid, path)
 
 main()
