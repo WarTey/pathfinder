@@ -1,31 +1,27 @@
-from types import CellType
 import pygame
 from cell import Cell
 
 class Grid:
 	def __init__(self, screenWidth, screenHeight, cellSize):
 		self.cellSize = cellSize
-		maxCol = int(screenWidth / cellSize)
-		maxRow = int(screenHeight / cellSize)
-		grid = [[Cell() for _ in range(maxCol)] for _ in range(maxRow)]
-		grid[0][0].setStart()
-		grid[maxRow - 1][maxCol - 1].setEnd()
-		self.grid = grid
+		self.nbCol = int(screenWidth / cellSize)
+		self.nbRow = int(screenHeight / cellSize)
+
+		self.grid = [[Cell() for _ in range(self.nbCol)] for _ in range(self.nbRow)]
+		self.grid[0][0].setStart()
+		self.grid[self.nbRow - 1][self.nbCol - 1].setEnd()
 
 	def getCell(self, x, y):
 		return self.grid[int(y)][int(x)]
 
-	def handleGridLeftClick(self, x, y):
-		cellSize = self.cellSize
-		self.getCell(x / cellSize, y / cellSize).setWall()
+	def handleLeftClick(self, x, y):
+		self.getCell(x / self.cellSize, y / self.cellSize).setWall()
 
-	def handleGridRightClick(self, x, y):
-		cellSize = self.cellSize
-		self.getCell(x / cellSize, y / cellSize).setFree()
+	def handleRightClick(self, x, y):
+		self.getCell(x / self.cellSize, y / self.cellSize).setFree()
 
-	def drawCells(self, screen):
-		cellSize = self.cellSize
-		cellWidth = cellSize - 1
+	def draw(self, screen):
 		for row, cells in enumerate(self.grid):
 			for col, cell in enumerate(cells):
-				pygame.draw.rect(screen, cell.getCellColor(), pygame.Rect(col * cellSize, row * cellSize, cellWidth, cellWidth))
+				rect = pygame.Rect(col * self.cellSize, row * self.cellSize, self.cellSize - 1, self.cellSize - 1)
+				pygame.draw.rect(screen, cell.getColor(), rect)

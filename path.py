@@ -1,12 +1,12 @@
 class Path:
 	def __init__(self):
-		self.pathProcessing = False
+		self.isProcessing = False
 
-	def isProcessing(self):
-		return self.pathProcessing
+	def updateProcess(self):
+		self.isProcessing = not self.isProcessing
 
-	def setProcess(self, isProcessing):
-		self.pathProcessing = isProcessing
+	def getDistance(self):
+		pass
 
 	def process(self, grid):
 		pass

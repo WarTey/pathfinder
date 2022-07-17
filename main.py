@@ -1,60 +1,57 @@
+from enum import Enum
 import pygame
 from sys import exit
 from grid import Grid
 from path import Path
 
+class MouseType(Enum):
+	Left = 0
+	Right = 2
+
 class Game:
-	def __init__(self, screenWidth, screenHeight):
+	def __init__(self, screenWidth, screenHeight, windowTitle):
+		pygame.init()
 		self.screenWidth = screenWidth
 		self.screenHeight = screenHeight
-
-	def initPygame(self, windowTitle):
-		pygame.init()
-		screen = pygame.display.set_mode((self.screenWidth, self.screenHeight))
-		screen.fill('Black')
+		self.screen = pygame.display.set_mode((screenWidth, screenHeight))
+		self.screen.fill('Black')
 		pygame.display.set_caption(windowTitle)
 
-		self.screen = screen
-		self.clock = pygame.time.Clock()
+	def isMouseButtonInAction(self, mouseButton, eventType):
+		isMousePressed = pygame.mouse.get_pressed()
+		isMouseButtonPressed = isMousePressed[mouseButton]
+
+		return isMouseButtonPressed or isMouseButtonPressed and eventType == pygame.MOUSEMOTION
 
 	def handleMouse(self, eventType, grid):
-		isMouseMotionType = eventType == pygame.MOUSEMOTION
-		isMousePressed = pygame.mouse.get_pressed()
-		isLeftMousePressed = isMousePressed[0]
-		isRightMousePressed = isMousePressed[2]
 		mousePos = pygame.mouse.get_pos()
 
-		if isLeftMousePressed or isLeftMousePressed and isMouseMotionType:
-			grid.handleGridLeftClick(mousePos[0], mousePos[1])
-		elif isRightMousePressed or isRightMousePressed and isMouseMotionType:
-			grid.handleGridRightClick(mousePos[0], mousePos[1])
+		if self.isMouseButtonInAction(MouseType.Left.value, eventType):
+			grid.handleLeftClick(mousePos[0], mousePos[1])
+		elif self.isMouseButtonInAction(MouseType.Right.value, eventType):
+			grid.handleRightClick(mousePos[0], mousePos[1])
 
-	def handleKeyboard(self, eventKey, path, isPathProcessing):
+	def handleKeyboard(self, eventKey, path):
 		if eventKey == pygame.K_RETURN:
-			path.setProcess(not isPathProcessing)
+			path.updateProcess()
 
-	def loop(self, grid, path, clockTick = None):
+	def loop(self, grid, path):
 		while True:
 			for event in pygame.event.get():
-				eventType = event.type
-				isPathProcessing = path.isProcessing()
+				if not path.isProcessing:
+					self.handleMouse(event.type, grid)
 
-				if not isPathProcessing:
-					self.handleMouse(eventType, grid)
-
-				if eventType == pygame.KEYDOWN:
-					self.handleKeyboard(event.key, path, isPathProcessing)
-				elif eventType == pygame.QUIT:
+				if event.type == pygame.KEYDOWN:
+					self.handleKeyboard(event.key, path)
+				elif event.type == pygame.QUIT:
 					pygame.quit()
 					exit()
 
-			grid.drawCells(self.screen)
-			if isPathProcessing:
+			grid.draw(self.screen)
+			if path.isProcessing:
 				path.process(grid)
 
 			pygame.display.update()
-			if clockTick:
-				self.clock.tick(clockTick)
 
 def main():
 	SCREEN_WIDTH = 1000
@@ -62,8 +59,7 @@ def main():
 	CELL_SIZE = 50
 	WINDOW_TITLE = 'Pathfinder'
 
-	game = Game(SCREEN_WIDTH, SCREEN_HEIGHT)
-	game.initPygame(WINDOW_TITLE)
+	game = Game(SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW_TITLE)
 	grid = Grid(SCREEN_WIDTH, SCREEN_HEIGHT, CELL_SIZE)
 	path = Path()
 	game.loop(grid, path)
