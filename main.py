@@ -31,9 +31,9 @@ class Game:
 		elif self.isMouseButtonInAction(MouseType.Right.value, eventType):
 			grid.handleRightClick(mousePos[0], mousePos[1])
 
-	def handleKeyboard(self, eventKey, path):
+	def handleKeyboard(self, eventKey, path, grid):
 		if eventKey == pygame.K_RETURN:
-			path.updateProcess()
+			path.updateProcess(grid)
 
 	def loop(self, grid, path):
 		while True:
@@ -42,7 +42,7 @@ class Game:
 					self.handleMouse(event.type, grid)
 
 				if event.type == pygame.KEYDOWN:
-					self.handleKeyboard(event.key, path)
+					self.handleKeyboard(event.key, path, grid)
 				elif event.type == pygame.QUIT:
 					pygame.quit()
 					exit()
@@ -61,7 +61,7 @@ def main():
 
 	game = Game(SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW_TITLE)
 	grid = Grid(SCREEN_WIDTH, SCREEN_HEIGHT, CELL_SIZE)
-	path = Path()
+	path = Path(grid)
 	game.loop(grid, path)
 
 main()

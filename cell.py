@@ -10,22 +10,26 @@ class CellType(Enum):
 
 class Cell:
 	def __init__(self):
-		self.cellType = CellType.Free
-		self.cellValue = 0
-		self.cellParent = None
+		self.type = CellType.Free
+		self.startDistance = 0
+		self.endDistance = 0
+		self.score = 0
+		self.parent = None
 
 	def getColor(self):
-		return self.cellType.value
+		return self.type.value
 
-	def isValid(self, cellType):
-		return self.cellType == cellType
+	def isValid(self, type):
+		return self.type == type
 
-	def setType(self, cellType):
-		if ((cellType == CellType.Free and self.isValid(CellType.Wall)) or
-			(cellType == CellType.Wall and self.isValid(CellType.Free)) or
-			(cellType == CellType.Start and self.isValid(CellType.Free)) or
-			(cellType == CellType.End and self.isValid(CellType.Free))):
-			self.cellType = cellType
+	def setType(self, type):
+		if ((type == CellType.Free and self.isValid(CellType.Wall)) or
+			(type == CellType.Wall and self.isValid(CellType.Free)) or
+			(type == CellType.Explored and self.isValid(CellType.Free)) or
+			(type == CellType.Path and self.isValid(CellType.Explored)) or
+			(type == CellType.Start and self.isValid(CellType.Free)) or
+			(type == CellType.End and self.isValid(CellType.Free))):
+			self.type = type
 
 	def setFree(self):
 		self.setType(CellType.Free)
@@ -36,5 +40,20 @@ class Cell:
 	def setStart(self):
 		self.setType(CellType.Start)
 
+	def setExplored(self):
+		self.setType(CellType.Explored)
+
+	def setPath(self):
+		self.setType(CellType.Path)
+
 	def setEnd(self):
 		self.setType(CellType.End)
+
+	def isExplored(self):
+		return self.isValid(CellType.Explored)
+
+	def isPath(self):
+		return self.isValid(CellType.Path)
+
+	def isEnd(self):
+		return self.isValid(CellType.End)
