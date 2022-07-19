@@ -9,12 +9,14 @@ class CellType(Enum):
 	End = 'Red'
 
 class Cell:
-	def __init__(self):
+	def __init__(self, x, y):
 		self.type = CellType.Free
 		self.startDistance = 0
 		self.endDistance = 0
 		self.score = 0
 		self.parent = None
+		self.x = x
+		self.y = y
 
 	def getColor(self):
 		return self.type.value

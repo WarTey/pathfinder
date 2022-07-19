@@ -7,7 +7,7 @@ class Grid:
 		self.nbCol = int(screenWidth / cellSize)
 		self.nbRow = int(screenHeight / cellSize)
 
-		self.grid = [[Cell() for _ in range(self.nbCol)] for _ in range(self.nbRow)]
+		self.grid = [[Cell(x, y) for x in range(self.nbCol)] for y in range(self.nbRow)]
 		self.grid[0][0].setStart()
 		self.grid[self.nbRow - 1][self.nbCol - 1].setEnd()
 

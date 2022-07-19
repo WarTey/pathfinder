@@ -4,8 +4,7 @@ class Path:
 		self.initProcess(grid)
 
 	def initProcess(self, grid):
-		self.xStart = self.yStart = 0
-		self.cell = grid.getCell(self.xStart, self.yStart)
+		self.cell = grid.getCell(0, 0)
 		self.exploredCells = []
 
 	def updateProcess(self, grid):
@@ -16,46 +15,45 @@ class Path:
 	def getDistance(self, xFrom, yFrom, xTo, yTo):
 		distance = 0
 
-		#TODO: Inc distance with diag
 		while xFrom != xTo or yFrom != yTo:
-			if xFrom > xTo:
-				xFrom -= 1
-			elif xFrom < xTo:
-				xFrom += 1
-
-			if yFrom > yTo:
-				yFrom -= 1
-			elif yFrom < yTo:
-				yFrom += 1
-
-			distance += 1
+			distance += 14 if xFrom != xTo and yFrom != yTo else 10
+			xFrom += int((xTo - xFrom) / (abs(xTo - xFrom) or 1))
+			yFrom += int((yTo - yFrom) / (abs(yTo - yFrom) or 1))
 
 		return distance
 
 	def exploreCell(self, grid, x, y):
 		if x >= grid.nbCol or x < 0 or y >= grid.nbRow or y < 0:
-			return None
+			return
 
 		cell = grid.getCell(x, y)
 		cell.setExplored()
-		if not cell.isExplored():
-			return None
+		if not (cell.isExplored() or cell.isEnd()):
+			return
 
-		distanceFromStart = self.getDistance(x, y, self.xStart, self.yStart) #TODO: DEF startx and starty
+		distanceFromStart = self.getDistance(x, y, 0, 0) #TODO: DEF startx and starty
 		distanceFromEnd = self.getDistance(x, y, 19, 13) #TODO: DEF endx and endy
 
 		if distanceFromStart + distanceFromEnd >= cell.score and cell.score > 0:
-			return None
+			return
 
 		cell.startDistance = distanceFromStart
 		cell.endDistance = distanceFromEnd
 		cell.score = distanceFromStart + distanceFromEnd
 		cell.parent = self.cell
-		self.exploredCells.append(cell)
 
-		return cell
+		if not cell in self.exploredCells:
+			self.exploredCells.append(cell)
 
 	def getNextCell(self):
+		self.exploredCells.sort(key = lambda cell: (cell.score, cell.endDistance))
+		self.cell = self.exploredCells[0] if len(self.exploredCells) > 0 else None
+
+		if not self.cell:
+			return self.cell
+
+		self.cell.setPath()
+		self.exploredCells.remove(self.cell)
 		return self.cell
 
 	def process(self, grid):
@@ -63,16 +61,11 @@ class Path:
 			self.updateProcess(grid)
 			return
 
-		# TODO: Reduce with for loop
-		self.exploreCell(grid, self.xStart, self.yStart - 1)
-		self.exploreCell(grid, self.xStart + 1, self.yStart)
-		self.exploreCell(grid, self.xStart, self.yStart + 1)
-		self.exploreCell(grid, self.xStart - 1, self.yStart)
-		self.exploreCell(grid, self.xStart + 1, self.yStart + 1)
-		self.exploreCell(grid, self.xStart - 1, self.yStart + 1)
-		self.exploreCell(grid, self.xStart + 1, self.yStart - 1)
-		self.exploreCell(grid, self.xStart - 1, self.yStart - 1)
+		for x in range(-1, 2):
+			for y in range(-1, 2):
+				if x != 0 or y != 0:
+					self.exploreCell(grid, self.cell.x + x, self.cell.y + y)
 
 		nextCell = self.getNextCell()
-		if not nextCell.isPath():
+		if not nextCell or not nextCell.isPath():
 			self.updateProcess(grid)
