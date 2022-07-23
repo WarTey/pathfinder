@@ -11,12 +11,9 @@ class CellType(Enum):
 class Cell:
 	def __init__(self, x, y):
 		self.type = CellType.Free
-		self.startDistance = 0
-		self.endDistance = 0
-		self.score = 0
+		self.startDistance = self.endDistance = self.score = 0
 		self.parent = None
-		self.x = x
-		self.y = y
+		self.x, self.y = x, y
 
 	def getColor(self):
 		return self.type.value
@@ -51,8 +48,8 @@ class Cell:
 	def setEnd(self):
 		self.setType(CellType.End)
 
-	def isExplored(self):
-		return self.isValid(CellType.Explored)
+	def isExplorable(self):
+		return self.isValid(CellType.Free) or self.isEnd()
 
 	def isPath(self):
 		return self.isValid(CellType.Path)

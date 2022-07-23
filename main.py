@@ -11,8 +11,7 @@ class MouseType(Enum):
 class Game:
 	def __init__(self, screenWidth, screenHeight, windowTitle):
 		pygame.init()
-		self.screenWidth = screenWidth
-		self.screenHeight = screenHeight
+		self.screenWidth, self.screenHeight = screenWidth, screenHeight
 		self.screen = pygame.display.set_mode((screenWidth, screenHeight))
 		self.screen.fill('Black')
 		pygame.display.set_caption(windowTitle)
@@ -31,9 +30,9 @@ class Game:
 		elif self.isMouseButtonInAction(MouseType.Right.value, eventType):
 			grid.handleRightClick(mousePos[0], mousePos[1])
 
-	def handleKeyboard(self, eventKey, path, grid):
+	def handleKeyboard(self, eventKey, path):
 		if eventKey == pygame.K_RETURN:
-			path.updateProcess(grid)
+			path.updateProcess()
 
 	def loop(self, grid, path):
 		while True:
@@ -42,7 +41,7 @@ class Game:
 					self.handleMouse(event.type, grid)
 
 				if event.type == pygame.KEYDOWN:
-					self.handleKeyboard(event.key, path, grid)
+					self.handleKeyboard(event.key, path)
 				elif event.type == pygame.QUIT:
 					pygame.quit()
 					exit()
@@ -54,14 +53,15 @@ class Game:
 			pygame.display.update()
 
 def main():
-	SCREEN_WIDTH = 1000
-	SCREEN_HEIGHT = 700
+	SCREEN_WIDTH, SCREEN_HEIGHT = 1000, 700
 	CELL_SIZE = 50
 	WINDOW_TITLE = 'Pathfinder'
+	START_X, START_Y = 0, 0
+	END_X, END_Y = 10, 10
 
 	game = Game(SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW_TITLE)
-	grid = Grid(SCREEN_WIDTH, SCREEN_HEIGHT, CELL_SIZE)
-	path = Path(grid)
+	grid = Grid(SCREEN_WIDTH, SCREEN_HEIGHT, CELL_SIZE, START_X, START_Y, END_X, END_Y)
+	path = Path(grid, START_X, START_Y, END_X, END_Y)
 	game.loop(grid, path)
 
 main()

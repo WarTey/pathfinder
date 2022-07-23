@@ -1,16 +1,16 @@
 class Path:
-	def __init__(self, grid):
+	def __init__(self, grid, startX, startY, endX, endY):
 		self.isProcessing = False
+		self.startX, self.startY, self.endX, self.endY = startX, startY, endX, endY
 		self.initProcess(grid)
 
 	def initProcess(self, grid):
-		self.cell = grid.getCell(0, 0)
+		self.cell = grid.getCell(self.startX, self.startY)
 		self.exploredCells = []
+		self.traveledCells = [self.cell]
 
-	def updateProcess(self, grid):
+	def updateProcess(self):
 		self.isProcessing = not self.isProcessing
-		if self.isProcessing:
-			self.initProcess(grid)
 
 	def getDistance(self, xFrom, yFrom, xTo, yTo):
 		distance = 0
@@ -27,14 +27,20 @@ class Path:
 			return
 
 		cell = grid.getCell(x, y)
-		cell.setExplored()
-		if not (cell.isExplored() or cell.isEnd()):
+		if not cell.isExplorable() or cell in self.traveledCells:
 			return
 
-		distanceFromStart = self.getDistance(x, y, 0, 0) #TODO: DEF startx and starty
-		distanceFromEnd = self.getDistance(x, y, 19, 13) #TODO: DEF endx and endy
+		cell.setExplored()
+		if not cell in self.exploredCells:
+			self.exploredCells.append(cell)
 
-		if distanceFromStart + distanceFromEnd >= cell.score and cell.score > 0:
+		distanceFromStart = self.cell.startDistance + self.getDistance(self.cell.x, self.cell.y, x, y)
+		distanceFromEnd = self.getDistance(x, y, self.endX, self.endY)
+
+		isCellScoreInvalid = distanceFromStart + distanceFromEnd > cell.score
+		isCellFarFromEnd = distanceFromStart + distanceFromEnd == cell.score and distanceFromEnd >= cell.endDistance
+
+		if cell.score > 0 and (isCellScoreInvalid or isCellFarFromEnd):
 			return
 
 		cell.startDistance = distanceFromStart
@@ -42,23 +48,24 @@ class Path:
 		cell.score = distanceFromStart + distanceFromEnd
 		cell.parent = self.cell
 
-		if not cell in self.exploredCells:
-			self.exploredCells.append(cell)
+	def setNextCell(self):
+		if not len(self.exploredCells):
+			self.updateProcess()
 
-	def getNextCell(self):
 		self.exploredCells.sort(key = lambda cell: (cell.score, cell.endDistance))
-		self.cell = self.exploredCells[0] if len(self.exploredCells) > 0 else None
-
-		if not self.cell:
-			return self.cell
-
-		self.cell.setPath()
+		self.cell = self.exploredCells[0]
 		self.exploredCells.remove(self.cell)
-		return self.cell
+		self.traveledCells.append(self.cell)
+
+	def colorPath(self):
+		while self.cell:
+			self.cell.setPath()
+			self.cell = self.cell.parent
 
 	def process(self, grid):
-		if self.cell.isEnd():
-			self.updateProcess(grid)
+		if not self.cell or self.cell.isEnd():
+			self.colorPath()
+			self.updateProcess()
 			return
 
 		for x in range(-1, 2):
@@ -66,6 +73,4 @@ class Path:
 				if x != 0 or y != 0:
 					self.exploreCell(grid, self.cell.x + x, self.cell.y + y)
 
-		nextCell = self.getNextCell()
-		if not nextCell or not nextCell.isPath():
-			self.updateProcess(grid)
+		self.setNextCell()
